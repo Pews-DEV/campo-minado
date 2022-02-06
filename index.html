@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title></title>
+    <script src="js/campo-minado.js"></script>
+</head>
+
+<body>
+    <div id="exibir-execucao"></div>
+
+    <script>
+        var campoMinado = new CampoMinado();
+        var listaCampo = [];
+        var linha = [];
+        var bombas = [];
+        var posicao = [];
+        var espacos = [];
+
+
+        document.getElementById('exibir-execucao').innerHTML += '----------- Início do jogo -----------';
+        document.getElementById('exibir-execucao').innerHTML += '<pre>' + campoMinado.Tabuleiro() + '</pre>';
+
+        // Realize sua codificação a partir deste ponto, boa sorte!
+
+        // Verificar o jogo
+        function status() {
+            var aberto = campoMinado.JogoStatus();
+            const exibir = document.getElementById('exibir-execucao');
+            if (aberto === 0) {
+                exibir.innerHTML += '<br>----------- Jogo Aberto -----------';
+            }
+            else if (aberto === 2) {
+                exibir.innerHTML += '<br>----------- GAME OVER -----------';
+            }
+            else {
+                exibir.innerHTML += '<br>----------- Vitoria -----------';
+            }
+            exibir.innerHTML += '<pre>' + campoMinado.Tabuleiro() + '</pre>';
+        }
+
+        // Passo 1 - Encontrar as bombas
+        function encontrarBombaN1() {
+            var listaCampo = campoMinado.Tabuleiro().split('\r\n');
+            var contador = 0;
+            var posicaoBomba = [];
+
+            for (let y = 0; y < 9; y++) {
+                for (let x = 0; x < 9; x++) {
+                    let naoEstaBordaSuperior = y - 1 >= 0;
+                    let naoEstaBordaDireita = x + 1 <= 8;
+                    let naoEstaBordaEsquerda = x - 1 >= 0;
+                    let naoEstaBordaInferior = y + 1 <= 8;
+
+                    if (listaCampo[y][x] === '1') {
+                        if (naoEstaBordaSuperior && listaCampo[y - 1][x] === '-') {
+                            contador++;
+                            posicaoBomba = [[x, y - 1]];
+                        }
+                        if (naoEstaBordaSuperior && naoEstaBordaDireita && listaCampo[y - 1][x + 1] === '-') {
+                            contador++;
+                            posicaoBomba = [[x + 1, y - 1]];
+                        }
+                        if (naoEstaBordaSuperior && naoEstaBordaEsquerda && listaCampo[y - 1][x - 1] === '-') {
+                            contador++;
+                            posicaoBomba = [[x - 1, y - 1]];
+                        }
+                        if (naoEstaBordaInferior && listaCampo[y + 1][x] === '-') {
+                            contador++;
+                            posicaoBomba = [[x, y + 1]];
+                        }
+                        if (naoEstaBordaInferior && naoEstaBordaDireita && listaCampo[y + 1][x + 1] === '-') {
+                            contador++;
+                            posicaoBomba = [[x + 1, y + 1]];
+                        }
+                        if (naoEstaBordaInferior && naoEstaBordaEsquerda && listaCampo[y + 1][x - 1] === '-') {
+                            contador++;
+                            posicaoBomba = [[x - 1, y + 1]];
+                        }
+                        if (naoEstaBordaDireita && listaCampo[y][x + 1] === '-') {
+                            contador++;
+                            posicaoBomba = [[x + 1, y]];
+                        }
+                        if (naoEstaBordaSuperior && listaCampo[y][x - 1] === '-') {
+                            contador++;
+                            posicaoBomba = [[x - 1, y]];
+                        }
+                    }
+
+                    if (contador === 1) {
+                        if (bombas.includes((posicaoBomba[0][0]) + '' + (posicaoBomba[0][1]))) {
+                        } else {
+                            bombas.push((posicaoBomba[0][0]) + '' + (posicaoBomba[0][1]));
+                            document.getElementById('exibir-execucao').innerHTML += 'Bomba encontrada: linha(' + (posicaoBomba[0][1] + 1) + ') / coluna(' + (posicaoBomba[0][0] + 1) + ')' + '<br>';
+                        }
+                    }
+                    contador = 0;
+                }
+            }
+            status();
+        }
+
+        // Passo 2 - Localizar mais bombas
+        function encontrarBombaN2() {
+            var contador = 0;
+            var posicaoBomba = [];
+            var listaCampo = campoMinado.Tabuleiro().split('\r\n');
+
+            for (y = 0; y < 9; y++) {
+                for (x = 0; x < 9; x++) {
+                    let naoEstaBordaSuperior = y - 1 >= 0;
+                    let naoEstaBordaDireita = x + 1 <= 8;
+                    let naoEstaBordaEsquerda = x - 1 >= 0;
+                    let naoEstaBordaInferior = y + 1 <= 8;
+                    if (listaCampo[y][x] === '2') {
+                        if (naoEstaBordaSuperior && listaCampo[y - 1][x] === '-') {
+                            contador++;
+                            posicaoBomba = [[x, y - 1]];
+                        }
+                        if (naoEstaBordaSuperior && naoEstaBordaDireita && listaCampo[y - 1][x + 1] === '-') {
+                            contador++;
+                            posicaoBomba = [[x + 1, y - 1]];
+                        }
+                        if (naoEstaBordaSuperior && naoEstaBordaEsquerda && listaCampo[y - 1][x - 1] === '-') {
+                            contador++;
+                            posicaoBomba = [[x - 1, y - 1]];
+                        }
+                        if (naoEstaBordaInferior && listaCampo[y + 1][x] === '-') {
+                            contador++;
+                            posicaoBomba = [[x, y + 1]];
+                        }
+                        if (naoEstaBordaInferior && naoEstaBordaDireita && listaCampo[y + 1][x + 1] === '-') {
+                            contador++;
+                            posicaoBomba = [[x + 1, y + 1]];
+                        }
+                        if (naoEstaBordaInferior && naoEstaBordaEsquerda && listaCampo[y + 1][x - 1] === '-') {
+                            contador++;
+                            posicaoBomba = [[x - 1, y + 1]];
+                        }
+                        if (naoEstaBordaDireita && listaCampo[y][x + 1] === '-') {
+                            contador++;
+                            posicaoBomba = [[x + 1, y]];
+                        }
+                        if (naoEstaBordaSuperior && listaCampo[y][x - 1] === '-') {
+                            contador++;
+                            posicaoBomba = [[x - 1, y]];
+                        }
+                    }
+                    if (contador === 2) {
+                        if (bombas.includes((posicaoBomba[0][0]) + '' + (posicaoBomba[0][1]))) {
+                        } else {
+                            bombas.push((posicaoBomba[0][0]) + '' + (posicaoBomba[0][1]));
+                            document.getElementById('exibir-execucao').innerHTML += 'Bomba encontrada: linha(' + (posicaoBomba[0][1] + 1) + ') / coluna(' + (posicaoBomba[0][0] + 1) + ')' + '<br>';
+                        }
+                    }
+                    contador = 0;
+                }
+            }
+            status();
+        }
+
+        // Passo 3 - Localizar possiveis aberturas proximo ao numero 1
+        function localizarAberturasN1() {
+            var contador = 0;
+
+            listaCampo = campoMinado.Tabuleiro().split('\r\n');
+            for (y = 0; y < 9; y++) {
+                for (x = 0; x < 9; x++) {
+                    if (listaCampo[y][x] === '1') {
+                        if ((y - 1 >= 0) && listaCampo[y - 1][x] === '-') { // cima
+                            if (!posicao.includes((x) + '' + (y - 1))) {
+                                posicao.push((x) + '' + (y - 1));
+                                contador++;
+                            }
+                        }
+                        if ((y - 1 >= 0) && (x + 1 <= 8) && listaCampo[y - 1][x + 1] === '-') { // cima frente
+                            if (!posicao.includes((x + 1) + '' + (y - 1))) {
+                                posicao.push((x + 1) + '' + (y - 1));
+                                contador++;
+                            }
+                        }
+                        if ((y - 1 >= 0) && (x - 1 >= 0) && listaCampo[y - 1][x - 1] === '-') { // cima atras
+                            if (!posicao.includes((x - 1) + '' + (y - 1))) {
+                                posicao.push((x - 1) + '' + (y - 1));
+                                contador++;
+                            }
+                        }
+                        if ((y + 1 <= 8) && listaCampo[y + 1][x] === '-') { // baixo
+                            if (!posicao.includes((x) + '' + (y + 1))) {
+                                posicao.push((x) + '' + (y + 1));
+                                contador++;
+                            }
+                        }
+                        if ((y + 1 <= 8) && (x + 1 <= 8) && listaCampo[y + 1][x + 1] === '-') { // baixo frente
+                            if (!posicao.includes((x + 1) + '' + (y + 1))) {
+                                posicao.push((x + 1) + '' + (y + 1));
+                                contador++;
+                            }
+                        }
+                        if ((y + 1 <= 8) && (x - 1 >= 0) && listaCampo[y + 1][x - 1] === '-') { // baixo atras
+                            if (!posicao.includes((x - 1) + '' + (y + 1))) {
+                                posicao.push((x - 1) + '' + (y + 1));
+                                contador++;
+                            }
+                        }
+                        if ((x + 1 <= 8) && listaCampo[y][x + 1] === '-') { // frente
+                            if (!posicao.includes((x + 1) + '' + (y))) {
+                                posicao.push((x + 1) + '' + (y));
+                                contador++;
+                            }
+                        }
+                        if ((y - 1 >= 0) && listaCampo[y][x - 1] === '-') { // atras
+
+                            if (!posicao.includes((x - 1) + '' + (y))) {
+                                posicao.push((x - 1) + '' + (y));
+                                contador++;
+                            }
+                        }
+                    }
+                    if (contador === 2) {
+                        for (let n = 0; n < posicao.length; n++) {
+                            if (!bombas.includes(posicao[n])) {
+                                campoMinado.Abrir(parseInt(posicao[n][1]) + 1, parseInt(posicao[n][0]) + 1);
+                                document.getElementById('exibir-execucao').innerHTML += 'Abrindo posição: linha(' + (parseInt(posicao[n][1]) + 1) + ') / coluna(' + (parseInt(posicao[n][0]) + 1) + ')' + '<br>';
+                                posicao.splice(n, 1);
+                                break;
+                            }
+
+                        }
+                    }
+                }
+                contador = 0;
+            }
+            status();
+        }
+
+        function concluir() {
+            for (y = 0; y < 9; y++) {
+                for (x = 0; x < 9; x++) {
+                    if (listaCampo[y][x] === '-') {
+                        espacos.push((x) + '' + (y));
+                    }
+                }
+            }
+            for (let n = 0; n < espacos.length; n++) {
+                if (!bombas.includes(espacos[n])) {
+                    campoMinado.Abrir(parseInt(espacos[n][1]) + 1, parseInt(espacos[n][0]) + 1);
+                    document.getElementById('exibir-execucao').innerHTML += 'Abrindo posição: linha(' + (parseInt(espacos[n][1]) + 1) + ') / coluna(' + (parseInt(espacos[n][0]) + 1) + ')' + '<br>';
+                }
+
+            }
+            status();
+        }
+
+        while (bombas.length < 9) {
+            encontrarBombaN1();
+            encontrarBombaN2();
+            localizarAberturasN1();
+        }
+
+        concluir();
+
+    </script>
+</body>
+
+</html>
